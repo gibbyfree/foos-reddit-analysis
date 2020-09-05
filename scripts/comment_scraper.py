@@ -17,15 +17,18 @@ reddit = praw.Reddit(client_id='VDczLkMdXSQQdQ', \
                      client_secret='z1bRECrJer5qe_cGXu_Nf94xTcY', \
                      user_agent='py:scraper')
 
-# Create the (soon-to-be-massive) dictionary for storing each slur-containing comment.
+# Create the dictionary for storing each slur-containing comment.
 comment_dict = { "title": [], "score": [], "id": [], "body": [], "slurs": []}
-# Create the (soon-to-be-massive) dictionary for storing each slur's usage information.
+# Create the dictionary for storing each slur's usage information.
 slur_use_dict = {"id": [], "slur_used": [], "slur_category": []}
+# Create the dictionary for storing each thread's slur tally.
+thread_dict = {"title": [], "slurs_used": [], "category": []}
 
 # Analyze each story.
 for story in stories_data:
     submission = reddit.submission(url=story['url'])
     submission.comments.replace_more(limit=0)
+    submission_slur_count = 0
     # Add basic info about each comment to the dictionary, if there are slurs in the comment.
     for comment in submission.comments.list():
         # Check each comment for slurs.
@@ -33,6 +36,7 @@ for story in stories_data:
         for slur in slurs_data:
             if slur['term'] in comment.body:
                 slur_count = slur_count + 1
+                submission_slur_count = submission_slur_count + 1
                 slur_use_dict['id'].append(comment.id)
                 slur_use_dict['slur_used'].append(slur['term'])
                 slur_use_dict['slur_category'].append(slur['category'])
@@ -43,6 +47,9 @@ for story in stories_data:
             comment_dict['id'].append(comment.id)
             comment_dict['body'].append(comment.body)
             comment_dict['slurs'].append(slur_count)
+    thread_dict['title'].append(submission.title)
+    thread_dict['slurs_used'].append(submission_slur_count)
+    thread_dict['category'].append(story['category'])
 
 
 # Export all of the data!
