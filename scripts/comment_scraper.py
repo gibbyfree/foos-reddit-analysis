@@ -1,8 +1,6 @@
 import praw
 import pandas
-import datetime
 import json
-import re
 
 # Read from stories and slurs json files.
 with open('../data/stories.json') as stories_json:
@@ -35,8 +33,8 @@ for story in stories_data:
         slur_count = 0
         for slur in slurs_data:
             if slur['term'] in comment.body:
-                slur_count = slur_count + 1
-                submission_slur_count = submission_slur_count + 1
+                slur_count += 1
+                submission_slur_count += 1
                 slur_use_dict['id'].append(comment.id)
                 slur_use_dict['slur_used'].append(slur['term'])
                 slur_use_dict['slur_category'].append(slur['category'])
@@ -58,4 +56,6 @@ comment_data.to_csv('../data/comments.csv', index=False)
 
 slur_use_data = pandas.DataFrame(slur_use_dict)
 slur_use_data.to_csv('../data/slurs.csv', index=False)
-        
+
+thread_data = pandas.DataFrame(thread_dict)
+thread_data.to_csv('../data/threads.csv', index=False)
